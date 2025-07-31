@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Smart Loan Approval System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 500px;
+      margin: 40px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    h2 {
+      text-align: center;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+    }
+    input,
+    select {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 10px;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #0056b3;
+    }
+    .result {
+      margin-top: 20px;
+      text-align: center;
+      font-size: 18px;
+      font-weight: bold;
+    }
+    .approved {
+      color: green;
+    }
+    .rejected {
+      color: red;
+    }
+    .error {
+      color: darkred;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Loan Application</h2>
+    <form id="loanForm">
+      <label>Loan ID <input type="number" name="Loan_ID" required /></label>
+      <label>Gender
+        <select name="Gender" required>
+          <option value="0">Male</option>
+          <option value="1">Female</option>
+        </select>
+      </label>
+      <label>Married
+        <select name="Married" required>
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </label>
+      <label>Dependents <input type="number" name="Dependents" min="0" required /></label>
+      <label>Education
+        <select name="Education" required>
+          <option value="0">Graduate</option>
+          <option value="1">Not Graduate</option>
+        </select>
+      </label>
+      <label>Self Employed
+        <select name="Self_Employed" required>
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </label>
+      <label>Applicant Income <input type="number" name="ApplicantIncome" min="0" required /></label>
+      <label>Coapplicant Income <input type="number" name="CoapplicantIncome" min="0" required /></label>
+      <label>Loan Amount <input type="number" name="LoanAmount" min="0" required /></label>
+      <label>Loan Amount Term <input type="number" name="Loan_Amount_Term" min="0" required /></label>
+      <label>Credit History
+        <select name="Credit_History" required>
+          <option value="0">No</option>
+          <option value="1">Yes</option>
+        </select>
+      </label>
+      <label>Property Area
+        <select name="Property_Area" required>
+          <option value="0">Urban</option>
+          <option value="1">Rural</option>
+          <option value="2">Semiurban</option>
+        </select>
+      </label>
+      <button type="submit">Apply</button>
+    </form>
+    <div class="result" id="result"></div>
+  </div>
+
+  <script>
+    document.getElementById('loanForm').onsubmit = async function (e) {
+      e.preventDefault();
+      const form = e.target;
+      const data = {};
+
+      // Collect all form inputs
+      for (let el of form.elements) {
+        if (el.name) data[el.name] = el.type === 'number' ? Number(el.value) : el.value;
+      }
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.textContent = 'Processing...';
+      resultDiv.className = 'result';
+
+      try {
+        const response = await fetch('http://localhost:8080/applyLoan', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+        console.log('API Response:', result); // Debug info
+
+        if (result.status === "Approved") {
+          resultDiv.textContent = 'Loan Approved!';
+          resultDiv.classList.add('approved');
+        } else if (result.status === "Rejected") {
+          resultDiv.textContent = 'Loan Rejected!';
+          resultDiv.classList.add('rejected');
+        } else if (result.error) {
+          resultDiv.textContent = 'Error: ' + result.error;
+          resultDiv.classList.add('error');
+        } else {
+          resultDiv.textContent = 'Unexpected response.';
+          resultDiv.classList.add('error');
+        }
+      } catch (err) {
+        resultDiv.textContent = 'Error: ' + err.message;
+        resultDiv.classList.add('error');
+      }
+    };
+  </script>
+</body>
+</html>
