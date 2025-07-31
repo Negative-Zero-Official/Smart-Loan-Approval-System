@@ -121,12 +121,22 @@
     document.getElementById('loanForm').onsubmit = async function (e) {
       e.preventDefault();
       const form = e.target;
-      const data = {};
 
-      // Collect all form inputs
-      for (let el of form.elements) {
-        if (el.name) data[el.name] = el.type === 'number' ? Number(el.value) : el.value;
-      }
+      // Explicitly build the correct, capitalized data object
+      const data = {
+        Loan_ID: Number(form.Loan_ID.value),
+        Gender: Number(form.Gender.value),
+        Married: Number(form.Married.value),
+        Dependents: Number(form.Dependents.value),
+        Education: Number(form.Education.value),
+        Self_Employed: Number(form.Self_Employed.value),
+        ApplicantIncome: Number(form.ApplicantIncome.value),
+        CoapplicantIncome: Number(form.CoapplicantIncome.value),
+        LoanAmount: Number(form.LoanAmount.value),
+        Loan_Amount_Term: Number(form.Loan_Amount_Term.value),
+        Credit_History: Number(form.Credit_History.value),
+        Property_Area: Number(form.Property_Area.value)
+      };
 
       const resultDiv = document.getElementById('result');
       resultDiv.textContent = 'Processing...';
